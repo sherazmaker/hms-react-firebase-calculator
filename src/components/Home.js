@@ -42,7 +42,7 @@ function Home() {
         limitToLast(10)
     );
     // State to hold the returned 10 history items to be mapped
-    const [history, loading, error] = useCollectionData(q, { idField: 'id' });
+    const [history, loading] = useCollectionData(q, { idField: 'id' });
     // Assuming user is accessible and contains the uid of the logged-in user
     const saveToHistory = async (answer) => {
         await addDoc(equationHistoryRef, {
