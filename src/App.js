@@ -22,11 +22,16 @@ const app = initializeApp(firebaseConfig);
 // Referencing firestore as a global variable
 const firestore = getFirestore(app);
 
+const USD_RATE = 284.60
+const EURO_RATE = 306.75
+
 function App() {
   const [firstNum, setFirstNum] = useState("");
   const [secondNum, setSecondNum] = useState("");
   const [operator, setOperator] = useState("");
   const [result, setResult] = useState("");
+  const [currSwitch, setCurrSwitch] = useState(false);
+  const [currency, setCurrency] = useState('')
 
   // Firesbase collection reference
   const equationHistoryRef = collection(firestore, "equation-history");
@@ -100,6 +105,13 @@ function App() {
         setResult(answer)
       }
       console.log(`${firstNum} ${operator} ${secondNum} = ${answer.toString()}`)
+      if (!currency) {
+        if (currency === 'usd') {
+          answer *= USD_RATE
+        } else {
+          answer *= EURO_RATE
+        }
+      }
       saveToHistory(answer)
       handleResult()
     }
@@ -109,6 +121,13 @@ function App() {
     setOperator("");
     setFirstNum("");
     setSecondNum("");
+  }
+
+  //currency handler 
+
+  const handleCurrency = (e) => {
+    const { value } = e.target
+    setCurrency(value)
   }
 
   return (
@@ -159,11 +178,19 @@ function App() {
               </div>
             </div>
           </section>
-
+          {/* {Currency section} */}
+          <section className="section col-md-7 text-center pt-2 pb-4 calc-center">
+            <div className="row">
+              <div className="numbers col-8">
+                <Button onClick={handleCurrency} text={'USD'} value={'usd'} />
+                <Button onClick={handleCurrency} text={"Euro"} value={'euro'} />
+              </div>
+            </div>
+          </section>
           <section className="section col-md-7 text-center pt-2 pb-4 calc-center">
             <h2>Equation History</h2>
             <div className="history">
-              {history && history.reverse().map(equation => <HistoryItem key={equation.id} text={equation.equation} date={equation.createdAt} />)}
+              {history && history.reverse().map((equation, index) => <HistoryItem key={equation.id} text={equation.equation} date={equation.createdAt} />)}
             </div>
           </section>
 
