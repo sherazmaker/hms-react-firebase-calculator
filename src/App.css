@@ -11,7 +11,9 @@ body {
 
 .body {
   position: relative;
-  background: url("./assests/background.jpg");
+  background: url("https://png.pngtree.com/background/20210709/original/pngtree-school-season-welcome-new-students-blackboard-hand-painted-picture-image_923634.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
   width: 100vw;
   height: 130vh;
 }
@@ -76,6 +78,15 @@ body {
   opacity: 65%;
 }
 
+.btn-width{
+  width: 100px;
+}
+
+.bold-text{
+  font-weight:600;
+  font-size: 20px;
+}
+
 .root {
   position: relative;
   z-index: -2;
@@ -85,3 +96,4 @@ body {
   font-size: 18px;
   font-weight: 600;
 }
+
