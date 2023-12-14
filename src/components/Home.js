@@ -14,13 +14,13 @@ const EURO_RATE = 306.75
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyCn0B-hZXdhIQQJMe7irVg8qpSyDiksQjg",
-    authDomain: "react-firebase-calculato-a32f2.firebaseapp.com",
-    projectId: "react-firebase-calculato-a32f2",
-    storageBucket: "react-firebase-calculato-a32f2.appspot.com",
-    messagingSenderId: "533721032304",
-    appId: "1:533721032304:web:f8eff524e1918f3347f6b5"
-};
+    apiKey: "AIzaSyB2CCliPp7yXmuoe8ivQraWgF3MIqUskhw",
+    authDomain: "calculator-app-53f81.firebaseapp.com",
+    projectId: "calculator-app-53f81",
+    storageBucket: "calculator-app-53f81.appspot.com",
+    messagingSenderId: "98836913818",
+    appId: "1:98836913818:web:bb1d8a2dbaa9f181338923"
+  };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 // Referencing firestore as a global variable
@@ -42,7 +42,7 @@ function Home() {
         limitToLast(10)
     );
     // State to hold the returned 10 history items to be mapped
-    const [history, loading] = useCollectionData(q, { idField: 'id' });
+    const [history, loading, error] = useCollectionData(q, { idField: 'id' });
     // Assuming user is accessible and contains the uid of the logged-in user
     const saveToHistory = async (answer) => {
         await addDoc(equationHistoryRef, {
@@ -52,7 +52,7 @@ function Home() {
         });
     }
 
-
+console.log({error})
     // Function to add digits to firstNum unless and operator has already been clicked
     const handleNumberClick = (e) => {
         if (operator === "" && result === "") {
