@@ -5,7 +5,7 @@ import HistoryItem from './HistoryItem'
 import Dashboard from '../components/dashboard'
 // Importing firebase SDK
 import { useUserContext } from "../context/userContext";
-import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limitToLast, where } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, limitToLast, where, deleteDoc, getDocs } from 'firebase/firestore';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { initializeApp } from 'firebase/app';
 
@@ -20,7 +20,7 @@ const firebaseConfig = {
     storageBucket: "calculator-app-53f81.appspot.com",
     messagingSenderId: "98836913818",
     appId: "1:98836913818:web:bb1d8a2dbaa9f181338923"
-  };
+};
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 // Referencing firestore as a global variable
@@ -42,7 +42,7 @@ function Home() {
         limitToLast(10)
     );
     // State to hold the returned 10 history items to be mapped
-    const [history, loading, error] = useCollectionData(q, { idField: 'id' });
+    const [history, loading] = useCollectionData(q, { idField: 'id' });
     // Assuming user is accessible and contains the uid of the logged-in user
     const saveToHistory = async (answer) => {
         await addDoc(equationHistoryRef, {
@@ -52,7 +52,30 @@ function Home() {
         });
     }
 
-console.log({error})
+    //delete loggedin user history 
+
+    const deleteHistory = () => {
+        const q = query(
+            equationHistoryRef,
+            where("userId", "==", user.uid)
+        );
+
+        // Execute the query
+        getDocs(q).then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                // Delete each document
+                deleteDoc(doc.ref).then(() => {
+                    console.log(`Document with ID ${doc.id} deleted`);
+                }).catch((error) => {
+                    console.error("Error deleting document: ", error);
+                });
+            });
+        }).catch((error) => {
+            console.error("Error fetching documents: ", error);
+        });
+        setResult("")
+    }
+
     // Function to add digits to firstNum unless and operator has already been clicked
     const handleNumberClick = (e) => {
         if (operator === "" && result === "") {
@@ -98,24 +121,24 @@ console.log({error})
         if (operator || currencyType) {
             if (operator === "+") {
                 answer = Number(firstNum) + Number(secondNum);
-                setResult(answer)
+                setResult(answer.toFixed(2))
             } else if (operator === "-") {
                 answer = Number(firstNum) - Number(secondNum);
-                setResult(answer)
+                setResult(answer.toFixed(2))
             } else if (operator === "*") {
                 answer = Number(firstNum) * Number(secondNum);
-                setResult(answer)
+                setResult(answer.toFixed(2))
             } else if (operator === "/") {
                 answer = Number(firstNum) / Number(secondNum);
-                setResult(answer)
+                setResult(answer.toFixed(2))
             }
             // Perform the currency conversion if a currencyType is provided
             //TODO Hanlde diff edhe cases 
             if (currencyType === 'usd') {
                 if (!result) {
-                    answer = '$' + Number(firstNum) * USD_RATE;
+                    answer = '$' + (Number(firstNum) * USD_RATE).toFixed(2);
                 } else {
-                    answer = '$' + Number(result) * USD_RATE;
+                    answer = '$' + (Number(result) * USD_RATE).toFixed(2);
                 }
                 setResult(answer)
             } else if (currencyType === 'euro') {
@@ -178,7 +201,6 @@ console.log({error})
                                 <Button onClick={handleNumberClick} text={"."} value={"."} />
                                 <Button onClick={handleClear} text={"Clear"} />
                             </div>
-
                             <div className="operators col-4">
                                 {/* Button components for operators will go here */}
                                 <Button onClick={handleOperatorClick} text={"/"} value={"/"} />
@@ -193,7 +215,10 @@ console.log({error})
                     </section>
 
                     <section className="section col-md-7 text-center pt-2 pb-4 calc-center">
-                        <h2>Equation History</h2>
+                        <div className='d-flex align-items-center justify-content-md-between'>
+                            <h2>Equation History</h2>
+                            <button type='click' className='bg-danger w-25' onClick={deleteHistory}>Clear History</button>
+                        </div>
                         <div className="history">
                             {loading ? <p>loading....</p> : history?.length > 0 ? history.reverse().map(equation => <HistoryItem key={equation.id} text={equation.equation} date={equation.createdAt} />) : <p>No previous history</p>}
                         </div>
